@@ -1,3 +1,10 @@
+#include "xprintf.h"
+
+void uart_debug_init(void);
+void uart_debug_putc( unsigned char c);
+void LogicAnalyzerTirggerConfig(void);
+void LogicAnalyzerTirgger(uint8_t t);
+
 /**
   ******************************************************************************
   * @file    uart_debug.h
@@ -23,9 +30,3 @@
   *
   ******************************************************************************
   */
-#include "xprintf.h"
-
-void uart_debug_init(void);
-void uart_debug_putc( unsigned char c);
-void LogicAnalyzerTirggerConfig(void);
-void LogicAnalyzerTirgger(uint8_t t);

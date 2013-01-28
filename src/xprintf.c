@@ -123,7 +123,7 @@ void xvprintf (
 			p = va_arg(arp, char*);
 			for (j = 0; p[j]; j++) ;
 			while (!(f & 2) && j++ < w) xputc(' ');
-			xputs(p);
+			debug_puts(p);
 			while (j++ < w) xputc(' ');
 			continue;
 		case 'C' :					/* Character */

@@ -1,48 +1,13 @@
-/**
-*****************************************************************************
-**
-**  File        : stm32f4xx_it.c
-**
-**  Abstract    : Main Interrupt Service Routines.
-**                This file provides template for all exceptions handler and
-**                peripherals interrupt service routine.
-**
-**  Environment : Atollic TrueSTUDIO(R)
-**                STMicroelectronics STM32F4xx Standard Peripherals Library
-**
-**  Distribution: The file is distributed
-**                of any kind.
-**
-**  (c)Copyright Atollic AB.
-**  You may use this file as-is or modify it according to the needs of your
-**  project. Distribution of this file (unmodified or modified) is not
-**  permitted. Atollic AB permit registered Atollic TrueSTUDIO(R) users the
-**  rights to distribute the assembled, compiled & linked contents of this
-**  file as part of an application binary file, provided that it is built
-**  using the Atollic TrueSTUDIO(R) toolchain.
-**
-**
-*****************************************************************************
-*/
-
-/* Includes ------------------------------------------------------------------*/
 #include "usb_bsp.h"
 #include "usb_hcd_int.h"
 #include "usbh_core.h"
 #include "stm32f4xx_it.h"
 
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-extern USB_OTG_CORE_HANDLE           USB_OTG_Core_dev;
-extern USBH_HOST                    USB_Host;
-/* Private function prototypes -----------------------------------------------*/
-/* Private functions ---------------------------------------------------------*/
+extern USB_OTG_CORE_HANDLE	USB_OTG_Core_dev;
+extern USBH_HOST			USB_Host;
 
-/******************************************************************************/
-/*            Cortex-M4 Processor Exceptions Handlers                         */
-/******************************************************************************/
+void TimingDelay_Decrement(void);
+void USB_OTG_BSP_TimerIRQ (void);
 
 /**
   * @brief   This function handles NMI exception.
@@ -139,7 +104,7 @@ void PendSV_Handler(void)
   */
 void SysTick_Handler(void)
 {
-    TimingDelay_Decrement();
+	TimingDelay_Decrement();
 }
 /**
   * @brief  TIM2_IRQHandler
@@ -149,7 +114,7 @@ void SysTick_Handler(void)
   */
 void TIM2_IRQHandler(void)
 {
-  USB_OTG_BSP_TimerIRQ(&USB_OTG_Core_dev);
+	USB_OTG_BSP_TimerIRQ(); //! &USB_OTG_Core_dev);
 }
 
 /**
@@ -165,21 +130,32 @@ void OTG_FS_IRQHandler(void)
 void OTG_HS_IRQHandler(void)
 #endif
 {
-  USBH_OTG_ISR_Handler(&USB_OTG_Core_dev);
+	USBH_OTG_ISR_Handler(&USB_OTG_Core_dev);
 }
-/******************************************************************************/
-/*                 STM32F4xx Peripherals Interrupt Handlers                   */
-/*  Add here the Interrupt Handler for the used peripheral(s) (PPP), for the  */
-/*  available peripheral interrupt handler's name please refer to the startup */
-/*  file (startup_stm32f4xx.s).                                               */
-/******************************************************************************/
 
 /**
-  * @brief  This function handles PPP interrupt request.
-  * @param  None
-  * @retval None
-  */
-/*void PPP_IRQHandler(void)
-{
-}*/
-
+*****************************************************************************
+**
+**  File        : stm32f4xx_it.c
+**
+**  Abstract    : Main Interrupt Service Routines.
+**                This file provides template for all exceptions handler and
+**                peripherals interrupt service routine.
+**
+**  Environment : Atollic TrueSTUDIO(R)
+**                STMicroelectronics STM32F4xx Standard Peripherals Library
+**
+**  Distribution: The file is distributed
+**                of any kind.
+**
+**  (c)Copyright Atollic AB.
+**  You may use this file as-is or modify it according to the needs of your
+**  project. Distribution of this file (unmodified or modified) is not
+**  permitted. Atollic AB permit registered Atollic TrueSTUDIO(R) users the
+**  rights to distribute the assembled, compiled & linked contents of this
+**  file as part of an application binary file, provided that it is built
+**  using the Atollic TrueSTUDIO(R) toolchain.
+**
+**
+*****************************************************************************
+*/
