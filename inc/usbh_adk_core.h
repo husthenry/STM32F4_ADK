@@ -124,12 +124,12 @@ typedef struct _ADK_Process
   uint16_t			   outSize;
   ADK_InitState		   initstate;
   ADK_State            state;
-  uint8_t			   acc_manufacturer[64];
-  uint8_t			   acc_model[64];
-  uint8_t			   acc_description[64];
-  uint8_t			   acc_version[64];
-  uint8_t			   acc_uri[64];
-  uint8_t			   acc_serial[64];
+	char			   acc_manufacturer[64];
+	char			   acc_model[64];
+	char			   acc_description[64];
+	char			   acc_version[64];
+	char			   acc_uri[64];
+	char			   acc_serial[64];
   uint16_t			   protocol;
 }
 ADK_Machine_TypeDef;
@@ -140,7 +140,14 @@ ADK_Machine_TypeDef;
 /** @defgroup USBH_ADK_CORE_Exported_FunctionsPrototype
   * @{
   */
-void USBH_ADK_Init(uint8_t* manufacture, uint8_t* model, uint8_t* description, uint8_t* version, uint8_t* uri, uint8_t* serial);
+void USBH_ADK_Init(
+	const char * manufacture,
+	const char * model,
+	const char * description,
+	const char * version,
+	const char * uri,
+	const char * serial
+	);
 USBH_Status USBH_ADK_write(USB_OTG_CORE_HANDLE *pdev, uint8_t *buff, uint16_t len);
 uint16_t USBH_ADK_read(USB_OTG_CORE_HANDLE *pdev, uint8_t *buff, uint16_t len);
 ADK_State USBH_ADK_getStatus(void);

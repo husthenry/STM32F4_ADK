@@ -118,10 +118,11 @@ USBH_Status USBH_InterruptSendData( USB_OTG_CORE_HANDLE *pdev,
                                     uint8_t length,
                                     uint8_t hc_num);
 
-USBH_Status USBH_CtlReq (USB_OTG_CORE_HANDLE *pdev,
-                         USBH_HOST *phost, 
-                         uint8_t             *buff,
-                         uint16_t            length);
+USBH_Status USBH_CtlReq (	USB_OTG_CORE_HANDLE	*pdev, 
+							USBH_HOST			*phost, 
+							uint8_t				*buff,
+							uint16_t			length
+							);
 
 USBH_Status USBH_IsocReceiveData( USB_OTG_CORE_HANDLE *pdev, 
                                 uint8_t *buff, 

@@ -25,14 +25,17 @@ static char *outptr;
 
 void xputc (char c)
 {
-	if (_CR_CRLF && c == '\n') xputc('\r');		/* CR -> CRLF */
+	if (_CR_CRLF && c == '\n')
+		xputc('\r');		/* CR -> CRLF */
 
-	if (outptr) {
+	if (outptr)
+	{
 		*outptr++ = (unsigned char)c;
 		return;
 	}
 
-	if (xfunc_out) xfunc_out((unsigned char)c);
+	if (xfunc_out)
+		xfunc_out((unsigned char)c);
 }
 
 
@@ -41,9 +44,7 @@ void xputc (char c)
 /* Put a null-terminated string                 */
 /*----------------------------------------------*/
 
-void xputs (					/* Put a string to the default device */
-	const char* str				/* Pointer to the string */
-)
+void xputs (const char* str)
 {
 	while (*str)
 		xputc(*str++);
@@ -57,15 +58,12 @@ void xfputs (					/* Put a string to the specified device */
 {
 	void (*pf)(unsigned char);
 
-
 	pf = xfunc_out;		/* Save current output device */
 	xfunc_out = func;	/* Switch output to specified device */
 	while (*str)		/* Put the string */
 		xputc(*str++);
 	xfunc_out = pf;		/* Restore output device */
 }
-
-
 
 /*----------------------------------------------*/
 /* Formatted string output                      */

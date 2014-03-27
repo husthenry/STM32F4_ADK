@@ -24,11 +24,10 @@
 #ifndef __USH_USR_H__
 #define __USH_USR_H__
 
-
-/* Includes ------------------------------------------------------------------*/
-#include "usbh_core.h"
-#include "stm32f4_discovery.h"
 #include <stdio.h>
+
+#include "bsp.h"
+#include "usbh_core.h"
 
 /** @addtogroup USBH_USER
 * @{

@@ -29,6 +29,7 @@
 #include "uart_debug.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 /** @defgroup USBH_ADK_CORE_Private_Variables
 * @{
@@ -59,7 +60,7 @@ static void USBH_ADK_InterfaceDeInit  (USB_OTG_CORE_HANDLE *pdev, void *phost);
 static USBH_Status USBH_ADK_Handle(USB_OTG_CORE_HANDLE *pdev, void *phost);
 static USBH_Status USBH_ADK_ClassRequest(USB_OTG_CORE_HANDLE *pdev, void *phost);
 static USBH_Status USBH_ADK_getProtocol ( USB_OTG_CORE_HANDLE *pdev, USBH_HOST *phost);
-static USBH_Status USBH_ADK_sendString ( USB_OTG_CORE_HANDLE *pdev, USBH_HOST *phost, uint16_t index, uint8_t* buff);
+static USBH_Status USBH_ADK_sendString ( USB_OTG_CORE_HANDLE *pdev, USBH_HOST *phost, uint16_t index, uint8_t * buff);
 static USBH_Status USBH_ADK_switch ( USB_OTG_CORE_HANDLE *pdev, USBH_HOST *phost);
 static USBH_Status USBH_ADK_configAndroid ( USB_OTG_CORE_HANDLE *pdev, USBH_HOST *phost);
 
@@ -85,7 +86,14 @@ USBH_Class_cb_TypeDef USBH_ADK_cb =
   * @param  serial: serial number string (max 63 chars)
   * @retval None
   */
-void USBH_ADK_Init(uint8_t* manufacture, uint8_t* model, uint8_t* description, uint8_t* version, uint8_t* uri, uint8_t* serial)
+void USBH_ADK_Init(
+	const char * manufacture,
+	const char * model,
+	const char * description,
+	const char * version,
+	const char * uri,
+	const char * serial
+	)
 {
 	strncpy(ADK_Machine.acc_manufacturer, manufacture, 64);
 	ADK_Machine.acc_manufacturer[63] = '\0';
@@ -191,7 +199,7 @@ static USBH_Status USBH_ADK_ClassRequest(USB_OTG_CORE_HANDLE *pdev, void *phost)
 				ADK_Machine.initstate = ADK_INIT_CONFIGURE_ANDROID;
 			}else{
 				ADK_Machine.initstate = ADK_INIT_GET_PROTOCOL;
-				ADK_Machine.protocol = -1;
+				ADK_Machine.protocol = 0xFFFF;
 			}
 			break;
 
@@ -318,8 +326,6 @@ static USBH_Status USBH_ADK_Handle(USB_OTG_CORE_HANDLE *pdev, void   *phost)
 {
 	USBH_Status status = USBH_BUSY;
 	URB_STATE URB_Status;
-	HC_STATUS HCD_Status;
-	uint32_t HCD_GXferCnt;
 
 	switch (ADK_Machine.state)
 	{
@@ -328,10 +334,11 @@ static USBH_Status USBH_ADK_Handle(USB_OTG_CORE_HANDLE *pdev, void   *phost)
 
 		case ADK_SEND_DATA:
 			URB_Status = HCD_GetURB_State(pdev , ADK_Machine.hc_num_out);
-			HCD_Status = HCD_GetHCState(pdev , ADK_Machine.hc_num_out);
-			HCD_GXferCnt = HCD_GetXferCnt(pdev , ADK_Machine.hc_num_out);
+			HCD_GetHCState(pdev , ADK_Machine.hc_num_out);
+			HCD_GetXferCnt(pdev , ADK_Machine.hc_num_out);
 
-			if(ADK_Machine.outSize > 0){
+			if(ADK_Machine.outSize > 0)
+			{
 				USBH_BulkSendData(pdev, ADK_Machine.outbuff, ADK_Machine.outSize, ADK_Machine.hc_num_out);
 				ADK_Machine.outSize = 0;
 				ADK_Machine.state = ADK_GET_DATA;
@@ -340,11 +347,11 @@ static USBH_Status USBH_ADK_Handle(USB_OTG_CORE_HANDLE *pdev, void   *phost)
 
 		case ADK_GET_DATA:
 			URB_Status = HCD_GetURB_State(pdev , ADK_Machine.hc_num_in);
-			HCD_Status = HCD_GetHCState(pdev , ADK_Machine.hc_num_in);
-			HCD_GXferCnt = HCD_GetXferCnt(pdev , ADK_Machine.hc_num_in);
-			if( URB_Status > URB_DONE){
+			HCD_GetHCState(pdev , ADK_Machine.hc_num_in);
+			HCD_GetXferCnt(pdev , ADK_Machine.hc_num_in);
+			if( URB_Status > URB_DONE)
 				break;
-			}
+
 			USBH_BulkReceiveData(pdev, ADK_Machine.inbuff, USBH_ADK_DATA_SIZE, ADK_Machine.hc_num_in);
 			ADK_Machine.state = ADK_IDLE;
 			break;
@@ -377,7 +384,7 @@ static USBH_Status USBH_ADK_getProtocol ( USB_OTG_CORE_HANDLE *pdev, USBH_HOST *
 	phost->Control.setup.b.wLength.w = 2;
 
 	/* Control Request */
-	return USBH_CtlReq(pdev, phost, &ADK_Machine.protocol , 2 );
+	return USBH_CtlReq(pdev, phost, (uint8_t *)&ADK_Machine.protocol, 2 );
 }
 
 /**
@@ -389,10 +396,10 @@ static USBH_Status USBH_ADK_getProtocol ( USB_OTG_CORE_HANDLE *pdev, USBH_HOST *
   * @param  buff: Identifying string
   * @retval USBH_Status
   */
-static USBH_Status USBH_ADK_sendString ( USB_OTG_CORE_HANDLE *pdev, USBH_HOST *phost, uint16_t index, uint8_t* buff)
+static USBH_Status USBH_ADK_sendString ( USB_OTG_CORE_HANDLE *pdev, USBH_HOST *phost, uint16_t index, uint8_t * buff)
 {
 	uint16_t length;
-	length = (uint16_t)strlen(buff)+1;
+	length = strlen((char *)buff) + 1;
 
 	phost->Control.setup.b.bmRequestType = USB_H2D | USB_REQ_TYPE_VENDOR | USB_REQ_RECIPIENT_DEVICE;
 	phost->Control.setup.b.bRequest = ACCESSORY_SEND_STRING;

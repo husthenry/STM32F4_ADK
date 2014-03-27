@@ -102,49 +102,50 @@ static USBH_Status USBH_SubmitSetupRequest(USBH_HOST *phost,
   * @param  length: length of the response
   * @retval Status
   */
-USBH_Status USBH_CtlReq     (USB_OTG_CORE_HANDLE *pdev, 
-                             USBH_HOST           *phost, 
-                             uint8_t             *buff,
-                             uint16_t            length)
+USBH_Status USBH_CtlReq (	USB_OTG_CORE_HANDLE	*pdev, 
+							USBH_HOST			*phost, 
+							uint8_t				*buff,
+							uint16_t			length
+							)
 {
-  USBH_Status status;
-  status = USBH_BUSY;
+	USBH_Status status;
+	status = USBH_BUSY;
   
-  switch (phost->RequestState)
-  {
-  case CMD_SEND:
-    /* Start a SETUP transfer */
-    USBH_SubmitSetupRequest(phost, buff, length);
-    phost->RequestState = CMD_WAIT;
-    status = USBH_BUSY;
-    break;
-    
-  case CMD_WAIT:
-     if (phost->Control.state == CTRL_COMPLETE ) 
-    {
-      /* Commands successfully sent and Response Received  */       
-      phost->RequestState = CMD_SEND;
-      phost->Control.state =CTRL_IDLE;  
-      status = USBH_OK;      
-    }
-    else if  (phost->Control.state == CTRL_ERROR)
-    {
-      /* Failure Mode */
-      phost->RequestState = CMD_SEND;
-      status = USBH_FAIL;
-    }   
-     else if  (phost->Control.state == CTRL_STALLED )
-    {
-      /* Commands successfully sent and Response Received  */       
-      phost->RequestState = CMD_SEND;
-      status = USBH_NOT_SUPPORTED;
-    }
-    break;
-    
-  default:
-    break; 
-  }
-  return status;
+	switch (phost->RequestState)
+	{
+		case CMD_SEND:
+			/* Start a SETUP transfer */
+			USBH_SubmitSetupRequest(phost, buff, length);
+			phost->RequestState = CMD_WAIT;
+			status = USBH_BUSY;
+			break;
+
+		case CMD_WAIT:
+			if (phost->Control.state == CTRL_COMPLETE ) 
+			{
+				/* Commands successfully sent and Response Received  */       
+				phost->RequestState = CMD_SEND;
+				phost->Control.state =CTRL_IDLE;  
+				status = USBH_OK;      
+			}
+			else if  (phost->Control.state == CTRL_ERROR)
+			{
+				/* Failure Mode */
+				phost->RequestState = CMD_SEND;
+				status = USBH_FAIL;
+			}   
+			else if  (phost->Control.state == CTRL_STALLED )
+			{
+				/* Commands successfully sent and Response Received  */       
+				phost->RequestState = CMD_SEND;
+				status = USBH_NOT_SUPPORTED;
+			}
+			break;
+
+		default:
+			break; 
+	}
+	return status;
 }
 
 /**
@@ -156,14 +157,15 @@ USBH_Status USBH_CtlReq     (USB_OTG_CORE_HANDLE *pdev,
   * @retval Status
   */
 USBH_Status USBH_CtlSendSetup ( USB_OTG_CORE_HANDLE *pdev, 
-                                uint8_t *buff, 
-                                uint8_t hc_num){
-  pdev->host.hc[hc_num].ep_is_in = 0;
-  pdev->host.hc[hc_num].data_pid = HC_PID_SETUP;   
-  pdev->host.hc[hc_num].xfer_buff = buff;
-  pdev->host.hc[hc_num].xfer_len = USBH_SETUP_PKT_SIZE;   
+                                uint8_t *buff,
+                                uint8_t hc_num)
+{
+	pdev->host.hc[hc_num].ep_is_in = 0;
+	pdev->host.hc[hc_num].data_pid = HC_PID_SETUP;   
+	pdev->host.hc[hc_num].xfer_buff = buff;
+	pdev->host.hc[hc_num].xfer_len = USBH_SETUP_PKT_SIZE;   
 
-  return (USBH_Status)HCD_SubmitRequest (pdev , hc_num);   
+	return (USBH_Status)HCD_SubmitRequest (pdev , hc_num);   
 }
 
 
